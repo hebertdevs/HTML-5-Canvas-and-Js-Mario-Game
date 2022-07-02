@@ -44,8 +44,28 @@ class Player {
     }
 }
 
+/* Class que ira definir a plataforma onde nosso personagem se movimentara */
+class Platform {
+  constructor(){
+      this.position = {
+        x:200,
+        y:200
+      }
+      this.width = 200
+      this. height = 20
+  }
+/* Metodo para o desenho da plataforma */ 
+  draw(){
+    c.fillStyle = "blue"
+    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+  }
+}
+
 /* Instanciamos nossa class Player */
 const player = new Player()
+
+/* Instaciamos nossa class Plataform */ 
+const platform = new Platform()
 
 /* Objeto que ira monitorar as teclas pressionadas */
 const keys = {
@@ -61,13 +81,20 @@ function animate() {
   requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height)
   player.update()
+  platform.draw()
 
 /* Condicionais para movimentação da posição do personagem */  
+/*Condicionais para evitar colisao do personagem com a plataforma */
   if(keys.right.pressed){
     player.velocity.x = 5
   } else if (keys.left.pressed){
     player.velocity.x = -5
-  } else {player.velocity.x = 0}
+  } else {player.velocity.x = 0
+
+}  if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width
+  ){
+    player.velocity.y = 0
+  }
 }
 
 animate()
