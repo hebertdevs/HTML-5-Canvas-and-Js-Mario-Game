@@ -62,6 +62,7 @@ function animate() {
   c.clearRect(0, 0, canvas.width, canvas.height)
   player.update()
 
+/* Condicionais para movimentação da posição do personagem */  
   if(keys.right.pressed){
     player.velocity.x = 5
   } else if (keys.left.pressed){
