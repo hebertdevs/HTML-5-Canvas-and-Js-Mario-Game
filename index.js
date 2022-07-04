@@ -15,6 +15,7 @@ const gravity = 1.5
 /* Class que iremos começar definindo parametros e metodos do nosso personagem */
 class Player {
     constructor(){
+      this.speed = 10
       this.position = {
         x: 100,
         y: 100
@@ -92,22 +93,20 @@ let backgroundImage = new Image();
 
 let  hillsImage = new Image(); 
 hillsImage.src = './images/hills.png';
+
+let platformSmall = new Image(); 
+platformSmall.src = './images/platformSmallTall.png';
+
   
 
 /* Instanciamos nossa class Player */
 let player = new Player()
 
 /* Instanciando como array multiplas plataformas e passando valores para o constructor*/ 
-let platforms =  [
-  new Platform({ x: -1, y: 470, image: imagePlatform}), 
-  new Platform({ x: imagePlatform.width -3, y: 470, image: imagePlatform}),
-  new Platform({ x: imagePlatform.width * 2 + 100, y: 470, image: imagePlatform})
-]
+let platforms =  []
 
 /* Instanciando como array para receber as imagens de fundo */   
-let genericObjects = [
-  new GenericObject({x: -1, y: -1, image: backgroundImage }),
-  new GenericObject({x: -1, y: -1, image: hillsImage })]
+let genericObjects = []
 
 /* Objeto que ira monitorar as teclas pressionadas */
 let keys = {
@@ -133,6 +132,9 @@ function init(){
 
   hillsImage = new Image(); 
 hillsImage.src = './images/hills.png';
+
+  platformSmall = new Image(); 
+  platformSmall.src = './images/platformSmallTall.png';
   
 
 /* Instanciamos nossa class Player */
@@ -140,9 +142,14 @@ hillsImage.src = './images/hills.png';
 
 /* Instanciando como array multiplas plataformas e passando valores para o constructor*/ 
  platforms =  [
+  new Platform({ x: imagePlatform.width * 4 + 300 - 2 + imagePlatform.width - platformSmall.width, y: 270, image: platformSmall}),
   new Platform({ x: -1, y: 470, image: imagePlatform}), 
   new Platform({ x: imagePlatform.width -3, y: 470, image: imagePlatform}),
-  new Platform({ x: imagePlatform.width * 2 + 100, y: 470, image: imagePlatform})
+  new Platform({ x: imagePlatform.width * 2 + 100, y: 470, image: imagePlatform}),
+  new Platform({ x: imagePlatform.width * 3 + 300, y: 470, image: imagePlatform}),
+  new Platform({ x: imagePlatform.width * 4 + 300 - 2, y: 470, image: imagePlatform}),
+  new Platform({ x: imagePlatform.width * 5 + 700 - 2, y: 470, image: imagePlatform}),
+
 ]
 
 /* Instanciando como array para receber as imagens de fundo */   
@@ -169,30 +176,31 @@ function animate() {
   platforms.forEach((platform) => {
     platform.draw()
   }) 
+
   player.update()
 
 /* Condicionais para movimentação da posição do personagem */  
 /*Condicionais para evitar colisao do personagem com a plataforma */
   if(keys.right.pressed && player.position.x < 400){
-    player.velocity.x = 5
-  } else if (keys.left.pressed && player.position.x > 100){
-    player.velocity.x = -5
+    player.velocity.x = player.speed
+  } else if ((keys.left.pressed && player.position.x > 100) || keys.left.pressed && scrollOffset === 0 && player.position.x > 0){
+    player.velocity.x = -player.speed
   } else {player.velocity.x = 0
       if(keys.right.pressed) {
-        scrollOffset += 5
+        scrollOffset += player.speed
         platforms.forEach((platform) => {
-          platform.position.x -= 5 // effeito parallax scroll
+          platform.position.x -= player.speed // effeito parallax scroll
         })       
         genericObjects.forEach(genericObjects => {
-          genericObjects.position.x -= 3
+          genericObjects.position.x -= player.speed * 0.66
         })  
-      } else if (keys.left.pressed) {
-        scrollOffset -= 5
+      } else if (keys.left.pressed && scrollOffset > 0) {
+        scrollOffset -= player.speed
         platforms.forEach((platform) => {
-          platform.position.x += 5  
+          platform.position.x += player.speed 
         })   
         genericObjects.forEach(genericObjects => {
-          genericObjects.position.x += 3 // effeito parallax scroll
+          genericObjects.position.x += player.speed * 0.66 // effeito parallax scroll
         })       
       }
 
@@ -204,7 +212,7 @@ function animate() {
   }
 }) 
 /*Condição de vencer o jogo */
- if (scrollOffset > 2000) {
+ if (scrollOffset > imagePlatform.width * 5 + 300 - 2) {
   console.log("You Win")
  }
 
@@ -215,6 +223,7 @@ if(player.position.y > canvas.height){
 }
 }
 
+init()
 animate()
 
 /* Vamos capturar eventos de teclado e definir com switch ações de movimentação*/
@@ -237,7 +246,7 @@ addEventListener('keydown', ({keyCode}) =>{
 
     case 87:
       console.log('up')
-      player.velocity.y -= 20
+      player.velocity.y -= 25
     break
   }
 
@@ -263,7 +272,6 @@ addEventListener('keyup', ({keyCode}) =>{
   
       case 87:
         console.log('up')
-        player.velocity.y -= 20
       break
     }
   
