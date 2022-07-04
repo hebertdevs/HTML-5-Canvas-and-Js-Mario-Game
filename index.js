@@ -1,5 +1,4 @@
 
-
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -38,11 +37,11 @@ class Player {
       this.draw()
       this.position.x += this.velocity.x
       this.position.y += this.velocity.y
-
+ 
 
         if(this.position.y + this.height + this.velocity.y <= canvas.height){
             this.velocity.y += gravity}
-        else {this.velocity.y = 0}
+        
     }
 }
 
@@ -65,6 +64,7 @@ class Platform {
   }
 }
 
+/* Class que ira definir as imagens de fundo */
 class GenericObject {
   constructor({ x, y, image }){
       this.position = {
@@ -77,37 +77,40 @@ class GenericObject {
 
       
   }
-/* Metodo para o desenho da plataforma */ 
+/* Metodo para o desenho das nossas imagens na tela */ 
   draw(){
     c.drawImage(this.image, this.position.x, this.position.y)
   }
 }
 
 /* Importando imagens com Js */
-const imagePlatform = new Image(); 
+let imagePlatform = new Image(); 
   imagePlatform.src = './images/platform.png';  
 
-const backgroundImage = new Image(); 
+let backgroundImage = new Image(); 
   backgroundImage.src = './images/background.png';
 
-const  hillsImage = new Image(); 
+let  hillsImage = new Image(); 
 hillsImage.src = './images/hills.png';
   
-console.log(backgroundImage)
+
 /* Instanciamos nossa class Player */
-const player = new Player()
+let player = new Player()
 
 /* Instanciando como array multiplas plataformas e passando valores para o constructor*/ 
-const platforms =  [
+let platforms =  [
   new Platform({ x: -1, y: 470, image: imagePlatform}), 
-  new Platform({ x: imagePlatform.width -3, y: 470, image: imagePlatform})]
+  new Platform({ x: imagePlatform.width -3, y: 470, image: imagePlatform}),
+  new Platform({ x: imagePlatform.width * 2 + 100, y: 470, image: imagePlatform})
+]
 
-const genericObjects = [
+/* Instanciando como array para receber as imagens de fundo */   
+let genericObjects = [
   new GenericObject({x: -1, y: -1, image: backgroundImage }),
   new GenericObject({x: -1, y: -1, image: hillsImage })]
 
 /* Objeto que ira monitorar as teclas pressionadas */
-const keys = {
+let keys = {
   right: {
     pressed: false
   },
@@ -118,6 +121,41 @@ const keys = {
 /* Variavel para dectar quanto da nossa tela se moveu */ 
 let scrollOffset = 0
 
+/*  Função que utilizaremos para iniciar e reiniciar o game */
+function init(){
+
+/* Importando imagens com Js */
+ imagePlatform = new Image(); 
+  imagePlatform.src = './images/platform.png';  
+
+ backgroundImage = new Image(); 
+  backgroundImage.src = './images/background.png';
+
+  hillsImage = new Image(); 
+hillsImage.src = './images/hills.png';
+  
+
+/* Instanciamos nossa class Player */
+ player = new Player()
+
+/* Instanciando como array multiplas plataformas e passando valores para o constructor*/ 
+ platforms =  [
+  new Platform({ x: -1, y: 470, image: imagePlatform}), 
+  new Platform({ x: imagePlatform.width -3, y: 470, image: imagePlatform}),
+  new Platform({ x: imagePlatform.width * 2 + 100, y: 470, image: imagePlatform})
+]
+
+/* Instanciando como array para receber as imagens de fundo */   
+ genericObjects = [
+  new GenericObject({x: -1, y: -1, image: backgroundImage }),
+  new GenericObject({x: -1, y: -1, image: hillsImage })]
+
+
+/* Variavel para dectar quanto da nossa tela se moveu */ 
+ scrollOffset = 0
+
+} // Final função init()
+
 /* Criamos a Função que ira fazer o loop de movimentação e limpar a tela */
 function animate() {
   requestAnimationFrame(animate)
@@ -125,7 +163,7 @@ function animate() {
   c.fillRect(0, 0, canvas.width, canvas.height)
 
   genericObjects.forEach(genericObjects => {
-    genericObjects.draw()
+    genericObjects.draw() // cada imagem de fundo sera desenhada na tela
   })
   
   platforms.forEach((platform) => {
@@ -143,7 +181,7 @@ function animate() {
       if(keys.right.pressed) {
         scrollOffset += 5
         platforms.forEach((platform) => {
-          platform.position.x -= 5
+          platform.position.x -= 5 // effeito parallax scroll
         })       
         genericObjects.forEach(genericObjects => {
           genericObjects.position.x -= 3
@@ -151,10 +189,10 @@ function animate() {
       } else if (keys.left.pressed) {
         scrollOffset -= 5
         platforms.forEach((platform) => {
-          platform.position.x += 5
+          platform.position.x += 5  
         })   
         genericObjects.forEach(genericObjects => {
-          genericObjects.position.x += 3
+          genericObjects.position.x += 3 // effeito parallax scroll
         })       
       }
 
@@ -165,9 +203,16 @@ function animate() {
     player.velocity.y = 0
   }
 }) 
- if (scrollOffset > 100) {
+/*Condição de vencer o jogo */
+ if (scrollOffset > 2000) {
   console.log("You Win")
  }
+
+/*Condição de perder o jogo chamando a função init()*/  
+if(player.position.y > canvas.height){
+  console.log("You lose")
+  init()
+}
 }
 
 animate()
