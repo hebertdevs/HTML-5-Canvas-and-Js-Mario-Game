@@ -1,9 +1,11 @@
+
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
 /*Definimos largura e altura do nosso canvas */
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+canvas.width = 1024
+canvas.height = 576
 
 
 console.log(c)
@@ -46,26 +48,34 @@ class Player {
 
 /* Class que ira definir a plataforma onde nosso personagem se movimentara */
 class Platform {
-  constructor(){
+  constructor({ x, y, image }){
       this.position = {
-        x:200,
-        y:200
+        x:x,
+        y:y
       }
-      this.width = 200
-      this. height = 20
+      this.image = image
+      this.width = image.width
+      this. height = image.height
+
+      
   }
 /* Metodo para o desenho da plataforma */ 
   draw(){
-    c.fillStyle = "blue"
-    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    c.drawImage(this.image, this.position.x, this.position.y)
   }
 }
+
+/* Importando imagens com Js */
+const image = new Image(); 
+image.src = './images/platform.png';
 
 /* Instanciamos nossa class Player */
 const player = new Player()
 
-/* Instaciamos nossa class Plataform */ 
-const platform = new Platform()
+/* Instanciando como array multiplas plataformas e passando valores para o constructor*/ 
+const platforms =  [
+  new Platform({ x: -1, y: 470, image: image}), 
+  new Platform({ x: image.width -3, y: 470, image: image})]
 
 /* Objeto que ira monitorar as teclas pressionadas */
 const keys = {
@@ -76,25 +86,49 @@ const keys = {
     pressed: false
   }
 }
+/* Variavel para dectar quanto da nossa tela se moveu */ 
+let scrollOffset = 0
+
 /* Criamos a Função que ira fazer o loop de movimentação e limpar a tela */
 function animate() {
   requestAnimationFrame(animate)
-  c.clearRect(0, 0, canvas.width, canvas.height)
+  c.fillStyle = 'white'
+  c.fillRect(0, 0, canvas.width, canvas.height)
+  
+  platforms.forEach((platform) => {
+    platform.draw()
+  }) 
   player.update()
-  platform.draw()
 
 /* Condicionais para movimentação da posição do personagem */  
 /*Condicionais para evitar colisao do personagem com a plataforma */
-  if(keys.right.pressed){
+  if(keys.right.pressed && player.position.x < 400){
     player.velocity.x = 5
-  } else if (keys.left.pressed){
+  } else if (keys.left.pressed && player.position.x > 100){
     player.velocity.x = -5
   } else {player.velocity.x = 0
+      if(keys.right.pressed) {
+        scrollOffset += 5
+        platforms.forEach((platform) => {
+          platform.position.x -= 5
+        })         
+      } else if (keys.left.pressed) {
+        scrollOffset -= 5
+        platforms.forEach((platform) => {
+          platform.position.x += 5
+        })         
+      }
 
-}  if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width
+} 
+ platforms.forEach((platform) => {
+ if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width
   ){
     player.velocity.y = 0
   }
+}) 
+ if (scrollOffset > 100) {
+  console.log("You Win")
+ }
 }
 
 animate()
