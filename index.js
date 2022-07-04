@@ -65,17 +65,46 @@ class Platform {
   }
 }
 
-/* Importando imagens com Js */
-const image = new Image(); 
-image.src = './images/platform.png';
+class GenericObject {
+  constructor({ x, y, image }){
+      this.position = {
+        x:x,
+        y:y
+      }
+      this.image = image
+      this.width = image.width
+      this. height = image.height
 
+      
+  }
+/* Metodo para o desenho da plataforma */ 
+  draw(){
+    c.drawImage(this.image, this.position.x, this.position.y)
+  }
+}
+
+/* Importando imagens com Js */
+const imagePlatform = new Image(); 
+  imagePlatform.src = './images/platform.png';  
+
+const backgroundImage = new Image(); 
+  backgroundImage.src = './images/background.png';
+
+const  hillsImage = new Image(); 
+hillsImage.src = './images/hills.png';
+  
+console.log(backgroundImage)
 /* Instanciamos nossa class Player */
 const player = new Player()
 
 /* Instanciando como array multiplas plataformas e passando valores para o constructor*/ 
 const platforms =  [
-  new Platform({ x: -1, y: 470, image: image}), 
-  new Platform({ x: image.width -3, y: 470, image: image})]
+  new Platform({ x: -1, y: 470, image: imagePlatform}), 
+  new Platform({ x: imagePlatform.width -3, y: 470, image: imagePlatform})]
+
+const genericObjects = [
+  new GenericObject({x: -1, y: -1, image: backgroundImage }),
+  new GenericObject({x: -1, y: -1, image: hillsImage })]
 
 /* Objeto que ira monitorar as teclas pressionadas */
 const keys = {
@@ -94,6 +123,10 @@ function animate() {
   requestAnimationFrame(animate)
   c.fillStyle = 'white'
   c.fillRect(0, 0, canvas.width, canvas.height)
+
+  genericObjects.forEach(genericObjects => {
+    genericObjects.draw()
+  })
   
   platforms.forEach((platform) => {
     platform.draw()
@@ -111,12 +144,18 @@ function animate() {
         scrollOffset += 5
         platforms.forEach((platform) => {
           platform.position.x -= 5
-        })         
+        })       
+        genericObjects.forEach(genericObjects => {
+          genericObjects.position.x -= 3
+        })  
       } else if (keys.left.pressed) {
         scrollOffset -= 5
         platforms.forEach((platform) => {
           platform.position.x += 5
-        })         
+        })   
+        genericObjects.forEach(genericObjects => {
+          genericObjects.position.x += 3
+        })       
       }
 
 } 
